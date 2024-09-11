@@ -16,9 +16,11 @@ namespace node_tree_sitter {
   }
   tstag tree # => 0x8AF2E5212AD58ABF, 0x7FA28BFC1966AC2D
 */
-const napi_type_tag TREE_TYPE_TAG = {
-  0x8AF2E5212AD58ABF, 0x7FA28BFC1966AC2D
-};
+// const napi_type_tag TREE_TYPE_TAG = {
+//   0x8AF2E5212AD58ABF, 0x7FA28BFC1966AC2D
+// };
+
+const char* TREE_TYPE_TAG = "tree-sitter-tree";
 
 using node_methods::UnmarshalNodeId;
 
@@ -42,7 +44,7 @@ void Tree::Init(Napi::Env env, Napi::Object exports) {
 }
 
 Tree::Tree(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Tree>(info), tree_(nullptr) {
-  Value().TypeTag(&TREE_TYPE_TAG);
+  Value().Set("__type", TREE_TYPE_TAG);
 }
 
 Tree::~Tree() {
@@ -68,7 +70,7 @@ const Tree *Tree::UnwrapTree(const Napi::Value &value) {
     return nullptr;
   }
   auto js_tree = value.As<Object>();
-  if (!js_tree.CheckTypeTag(&TREE_TYPE_TAG)) {
+  if (!js_tree.Has("__type") || js_tree.Get("__type").As<String>().Utf8Value() != TREE_TYPE_TAG) {
     return nullptr;
   }
   return Tree::Unwrap(js_tree);

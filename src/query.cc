@@ -18,9 +18,11 @@ namespace node_tree_sitter {
   }
   tstag query # => 0x8AF2E5212AD58ABF, 0x7B1FAB666CBD6803
 */
-const napi_type_tag QUERY_TYPE_TAG = {
-  0x8AF2E5212AD58ABF, 0x7B1FAB666CBD6803
-};
+// const napi_type_tag QUERY_TYPE_TAG = {
+//   0x8AF2E5212AD58ABF, 0x7B1FAB666CBD6803
+// };
+
+const char* QUERY_TYPE_TAG = "tree-sitter-query";
 
 const char *query_error_names[] = {
   "TSQueryErrorNone",
@@ -57,7 +59,7 @@ void Query::Init(Napi::Env env, Napi::Object exports) {
 Query::Query(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Query>(info) , query_(nullptr) {
   Napi::Env env = info.Env();
 
-  Value().TypeTag(&QUERY_TYPE_TAG);
+  Value().Set("__type", QUERY_TYPE_TAG);
 
   const TSLanguage *language = language_methods::UnwrapLanguage(info[0]);
   const char *source;
@@ -106,7 +108,7 @@ Query *Query::UnwrapQuery(const Napi::Value &value) {
     return nullptr;
   }
   auto js_query = value.As<Object>();
-  if (!js_query.CheckTypeTag(&QUERY_TYPE_TAG)) {
+  if (js_query.Get("__type").As<String>().Utf8Value() != QUERY_TYPE_TAG) {
     return nullptr;
   }
   return Query::Unwrap(js_query);

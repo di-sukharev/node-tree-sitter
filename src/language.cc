@@ -15,9 +15,10 @@ namespace node_tree_sitter::language_methods {
   }
   tstag language # => 0x8AF2E5212AD58ABF, 0xD5006CAD83ABBA16
 */
-const napi_type_tag LANGUAGE_TYPE_TAG = {
-  0x8AF2E5212AD58ABF, 0xD5006CAD83ABBA16
-};
+// const napi_type_tag LANGUAGE_TYPE_TAG = {
+//   0x8AF2E5212AD58ABF, 0xD5006CAD83ABBA16
+// };
+const char* LANGUAGE_TYPE_IDENTIFIER = "tree-sitter-language";
 
 const TSLanguage *UnwrapLanguage(Napi::Value value) {
   Napi::Env env = value.Env();
@@ -27,7 +28,7 @@ const TSLanguage *UnwrapLanguage(Napi::Value value) {
   }
 
   auto arg = value.As<External<const TSLanguage>>();
-  if (arg.IsExternal() && arg.CheckTypeTag(&LANGUAGE_TYPE_TAG)) {
+  if (arg.IsExternal()) {
     const TSLanguage *language = arg.Data();
     if (language != nullptr) {
       uint16_t version = ts_language_version(language);
